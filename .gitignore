@@ -16,6 +16,7 @@ experiments/*/results/*.pkl
 experiments/*/results/*.json
 !experiments/*/results/.gitkeep
 !experiments/*/results/*.md
+!experiments/*/results/first_observer.json
 experiments/comparison/figures/*.png
 !experiments/comparison/figures/.gitkeep
 

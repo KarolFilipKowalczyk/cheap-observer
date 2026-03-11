@@ -1,0 +1,43 @@
+{
+  "source": "C(8) sweep at 1000 steps",
+  "observers": [
+    {
+      "L": "01",
+      "R": "10001",
+      "seed": "01",
+      "sterile": false,
+      "steps_evolved": 1000,
+      "tau": 4,
+      "t_obs": 310,
+      "n_observers": 22,
+      "best_n_passed": 4,
+      "best_scores": {
+        "boundary": 0.24458333333333332,
+        "entropy": 1.5,
+        "decoupling": 0.6054330565770728,
+        "self_ref": 1.0
+      },
+      "elapsed": 2.115004539489746,
+      "max_strlen": 3002
+    },
+    {
+      "L": "10",
+      "R": "01110",
+      "seed": "10",
+      "sterile": false,
+      "steps_evolved": 1000,
+      "tau": 4,
+      "t_obs": 310,
+      "n_observers": 22,
+      "best_n_passed": 4,
+      "best_scores": {
+        "boundary": 0.24458333333333332,
+        "entropy": 1.5,
+        "decoupling": 0.6054330565770728,
+        "self_ref": 1.0
+      },
+      "elapsed": 2.0893349647521973,
+      "max_strlen": 3002
+    }
+  ]
+}

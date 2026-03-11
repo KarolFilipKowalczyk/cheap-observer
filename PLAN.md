@@ -2,26 +2,24 @@
 
 Last updated: 2026-03-11
 
-## Status: Wave 2 gate — C(6) swept, 0 observers, bottleneck identified
+## Status: FIRST OBSERVERS FOUND in C(8)
 
-C(6): 516 rules, 174 active (all growing), 0 observers, 0 near-misses
-at 3/4. Best result: 2/4 (01->1001, 10->0110) — entropy and self-
-reference pass, boundary stability and decoupling fail.
+C(8): 3076 rules, 1026 active, **2 observers**, 8 near-misses (3/4).
 
-Key findings:
-- All 84 length-preserving and 216 shrinking rules are sterile.
-  Single-rule binary string rewriting can only sustain dynamics
-  through growth.
-- 6 of 174 active rules pass the entropy pre-filter (first non-frozen
-  interiors in the project).
-- Boundary stability fails because the match site moves (B = 0.319,
-  threshold 0.3). Decoupling fails because dynamics are not self-
-  contained (D = 0.462, threshold 0.6).
-- Bottleneck shifted from "no internal dynamics" (C(4)) to "dynamics
-  exist but are not bounded" (C(6)).
+The two observers are 01->10001 and 10->01110 (mirror images).
+T_obs = 310, tau = 4. All four criteria pass: B = 0.245, H = 1.5,
+D = 0.605 (barely over 0.6 threshold), S = 1.0. P_obs(C(8)) = 0.2%.
 
-See `experiments/string_rewriting/results/c6_summary.md` for full
-results.
+The match site follows a period-3 sawtooth: advance +3, retreat -1,
+retreat -1. Net drift +1/3 per step. The oscillation creates a semi-
+localized active zone that sustains boundary stability over the
+persistence window (40 steps).
+
+Eight rules score 3/4, all failing only on causal decoupling. The
+observer exists on a knife-edge (D = 0.605, threshold 0.6).
+
+Wave 2 gate is passed. T_obs is finite. P_obs > 0. Proceed to Wave 3
+(measure T_rul and produce the first T_obs vs T_rul comparison).
 
 ## Performance profile (measured on CPU)
 
@@ -88,23 +86,25 @@ Run every rule in a class. First histogram of T_obs.
 - [x] experiments/string_rewriting/sweep.py (T_obs only)
 - [x] C(6) sweep: 0/174 observers, 6 rules past entropy filter,
       best 2/4 (see results/c6_summary.md)
-- [ ] C(8) sweep or longer runs on promising C(6) rules
+- [x] C(6) match site diagnostic (see results/c6_match_dynamics.md)
+- [x] C(8) sweep: 2/1026 observers, 8 near-misses at 3/4
+      (see results/c8_summary.md)
+- [x] first_observer.json saved
 - [ ] experiments/string_rewriting/analysis.ipynb (T_obs histogram)
 
-**Gate:** What fraction produces observers? If zero, definitions may be
-too tight or the rule class too small.
+**Gate:** What fraction produces observers?
 
 **C(4) gate result:** P_obs = 0. Rules too simple for any internal dynamics.
 
 **C(6) gate result:** P_obs = 0. First non-frozen interiors (6 rules).
-Bottleneck shifted to boundary stability (B = 0.319, threshold 0.3)
-and causal decoupling (D = 0.462, threshold 0.6). All length-preserving
-and shrinking rules are sterile — single-rule binary rewriting can
-only sustain dynamics through growth. Need C(8) or structural changes
-to the rule class.
+Match site drifts monotonically in all cases.
+
+**C(8) gate result:** P_obs = 0.2% (2/1026). **GATE PASSED.** First
+finite T_obs = 310. Observers are 01->10001 and 10->01110. Decoupling
+passes by 0.005 (knife-edge). All 8 near-misses fail only on D.
 
 
-### Wave 3 — The other side [BLOCKED on Wave 2]
+### Wave 3 — The other side [UNBLOCKED]
 Measure T_rul. Produce the central scatter plot.
 
 - [ ] src/ruliad/causal_invariance.py (canonical hash test, k=50)
@@ -210,3 +210,5 @@ Written last. Summarizes results that exist.
 | 2026-03-11 | Added performance profile. Detection is O(n^2), ~1.7hrs for 10K steps. CPU optimization before CUDA. |
 | 2026-03-11 | Wave 2 gate reached: T_obs = inf for all C(4). Uniform 2/4 failure (entropy=0, decoupling=0.5). Pivoting to C(6). Entropy pre-filter added to detect.py. |
 | 2026-03-11 | C(6) swept: 0/174 observers. 6 rules past entropy filter, best 2/4 (01->1001). All LP/shrinking rules sterile. Bottleneck: boundary stability and decoupling. |
+| 2026-03-11 | C(6) match site diagnostic: all 6 rules drift monotonically, no spatial localization possible. |
+| 2026-03-11 | C(8) swept: **2 observers found** (01->10001, 10->01110). T_obs=310. 8 near-misses at 3/4. P_obs=0.2%. Wave 2 gate passed. |
