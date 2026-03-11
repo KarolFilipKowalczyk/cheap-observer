@@ -1,1 +1,14 @@
-# Placeholder: Rule class parameters, detection thresholds, and seeds for string rewriting experiments.
+# String rewriting experiment configuration
+# See definitions.md for parameter semantics.
+
+max_description_length: 6    # Rule class C(6): 516 rules, 174 active
+steps: 1000                  # Evolution steps per rule
+workers: 4                   # Parallel workers (set to 1 for debugging)
+output: results/c6_raw.json  # Output path (relative to this file)
+
+# Observer criteria thresholds (definitions.md Section 5)
+criteria:
+  epsilon_B: 0.3             # Boundary stability threshold
+  epsilon_H: 1.0             # Internal entropy threshold (bits)
+  epsilon_D: 0.6             # Causal decoupling threshold
+  persistence_multiplier: 10 # Window = persistence_multiplier * tau

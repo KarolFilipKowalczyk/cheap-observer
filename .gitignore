@@ -10,12 +10,17 @@ build/
 # Jupyter
 .ipynb_checkpoints/
 
-# Experiment results (keep .gitkeep placeholders)
+# Experiment results (keep .gitkeep placeholders and .md summaries)
 experiments/*/results/*.csv
 experiments/*/results/*.pkl
+experiments/*/results/*.json
 !experiments/*/results/.gitkeep
+!experiments/*/results/*.md
 experiments/comparison/figures/*.png
 !experiments/comparison/figures/.gitkeep
+
+# Runner progress checkpoints
+.progress.json
 
 # IDE
 .vscode/
