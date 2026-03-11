@@ -25,9 +25,9 @@ follows:
   at time t causally influenced element b at time t+1. Edges connect
   only adjacent timesteps.
 
-"Element" is abstract — it could be a string position, a graph node,
-a hyperedge, a cell in a grid, or anything else that participates in
-rewrites. The label captures the element's state.
+"Element" is abstract — it could be a graph node, a hyperedge, a cell
+in a grid, or anything else that participates in rewrites. The label
+captures the element's state.
 
 A **rule class** must specify:
 
@@ -39,7 +39,7 @@ A **rule class** must specify:
    choosing among multiple applicable rewrites at a single step).
 
 The evolution graph is deterministic under the canonical update order:
-given a rule and a seed, the graph is uniquely determined. Section 7
+given a rule and a seed, the graph is uniquely determined. Section 6
 explicitly varies the update order to test causal invariance; all
 other sections use the canonical order.
 
@@ -65,9 +65,8 @@ size. A spark that produces no non-trivial evolution for any seed
 up to size s_max is classified as **sterile**. Default: s_max = 2l
 (twice the rule description length).
 
-"Smallest" and "size" are defined per rule class: for string
-rewriting, it is string length; for graph rewriting, it may be node
-count. Each appendix specifies this.
+"Smallest" and "size" are defined per rule class. Each appendix
+specifies the seed size measure for its rule class.
 
 
 ## 3. Characteristic time
@@ -87,11 +86,8 @@ If the autocorrelation never drops below 1/e within the evolution
 (indicating periodic or highly regular dynamics), tau is set to the
 period length.
 
-The distance function d(t) is defined per rule class. For
-configurations representable as symbol strings, d(t) is the Hamming
-distance between consecutive configurations, normalized by
-configuration size. Each appendix specifies the distance function
-for its rule class.
+The distance function d(t) is defined per rule class. Each appendix
+specifies the distance function for its rule class.
 
 This definition is standard in time series analysis. The
 characteristic time normalizes all duration-dependent quantities
@@ -339,13 +335,12 @@ description length:
    variation of the thresholds epsilon_B, epsilon_H, epsilon_D, and
    the persistence window multiplier.
 
-**Current status.** Tested on binary string rewriting C(8), where
-P_obs = 0.097% (unique) and P_rul(genuine) = 0%. The sets are
-completely disjoint — no rule has both finite T_obs and finite
-T_rul. The ordering claim (2) is vacuously true. The full test
-requires a rule class where both properties can be finite. See
-Appendix A for complete string rewriting results and Appendix B for
-the next planned rule class.
+**Current status.** Tested on one rule class (Appendix A) where
+P_obs > 0 and P_rul(genuine) = 0%. The sets are completely
+disjoint — no rule has both finite T_obs and finite T_rul. The
+ordering claim (2) is vacuously true. The full test requires a rule
+class where both properties can be finite. See Appendix A for
+complete results and Appendix B for the next rule class.
 
 
 ---
@@ -480,24 +475,201 @@ are irreconcilable. See
 analysis.
 
 
-## Appendix B: Directed graph rewriting (placeholder)
+## Appendix B: Directed graph rewriting
 
-This appendix will define directed graph rewriting as the second
-rule class. The Game of Intelligence engine
-(`experiments/directed_graph/engine/`) implements this rule class.
+This appendix defines directed graph rewriting as a rule class and
+specifies how it produces evolution graphs in the framework of §1–§9.
 
-The `src/observer/` and `src/ruliad/` modules are rule-class-agnostic
-and operate on evolution graphs. A new rule class needs only to
-implement the evolution graph protocol defined in §1:
 
-1. Specify the element type and label alphabet.
-2. Define how rewrites produce causal edges.
-3. Define a canonical update order.
-4. Implement the distance function for characteristic time (§3).
-5. Define spatial proximity for self-reference (§4.4).
+### B.1 Rule class
 
-The remaining definitions (observer criteria, T_obs, causal
-invariance, T_rul, null model, formal claim) apply without
-modification.
+A **directed graph rewriting rule** r is a triple (P, Q, phi) where:
 
-Content forthcoming.
+- **P** (pattern) is a non-empty, weakly connected, labeled directed
+  graph. Nodes carry labels from a finite alphabet of size k.
+- **Q** (replacement) is a labeled directed graph (may be empty,
+  need not be connected). Nodes carry labels from the same alphabet.
+- **phi: V(P) -> V(Q) ∪ {∗}** is the **reconnection map**. For each
+  node p in P, phi(p) specifies which node in Q inherits p's external
+  edges (edges from the host graph to p or from p to the host graph
+  that are not internal to P). If phi(p) = ∗, those external edges
+  are deleted.
+
+At each step, the rule finds an occurrence of P as a subgraph of the
+current state graph G_t, removes the matched nodes and their internal
+edges, inserts Q, and reconnects dangling edges according to phi.
+Specifically: for each external edge that was incident to a matched
+node p, if phi(p) = q in V(Q), the edge is redirected to q; if
+phi(p) = ∗, the edge is deleted.
+
+A **rule class** D(n, m, k) is the set of all directed graph
+rewriting rules where |V(P)| <= n, |V(Q)| <= m, and labels are
+drawn from an alphabet of size k.
+
+**Cardinality of D(2, 3, 2).** This is the initial experimental
+domain: patterns with at most 2 nodes, replacements with at most 3
+nodes, binary labels.
+
+For a directed graph on p nodes with k labels, allowing self-loops:
+there are k^p label assignments and 2^(p^2) edge configurations
+(each of the p^2 ordered pairs, including self-loops, is present or
+absent). For P, we require weak connectivity.
+
+| Component        | Count                                     |
+|------------------|-------------------------------------------|
+| P, 1 node        | k × 2^1 = 4                              |
+| P, 2 nodes (WC)  | k^2 × (2^4 - 2^2) = 4 × 12 = 48         |
+| Total P          | 52                                        |
+| Q, 0 nodes       | 1                                         |
+| Q, 1 node        | k × 2^1 = 4                              |
+| Q, 2 nodes       | k^2 × 2^4 = 64                           |
+| Q, 3 nodes       | k^3 × 2^9 = 4096                         |
+| Total Q          | 4165                                      |
+
+The "2 nodes (WC)" row subtracts the 2^2 = 4 edge configurations
+where no inter-node edge exists (both (1,2) and (2,1) absent; the
+four configs vary only in self-loops). A 2-node graph with only
+self-loops is disconnected.
+
+Reconnection maps: for P with p nodes and Q with q nodes, there are
+(q + 1)^p maps (each P-node maps to a Q-node or to ∗).
+
+| P size | Q size | Rules = |P| × |Q| × maps |
+|--------|--------|--------------------------------|
+| 1      | 0      | 4 × 1 × 1 = 4                 |
+| 1      | 1      | 4 × 4 × 2 = 32                |
+| 1      | 2      | 4 × 64 × 3 = 768              |
+| 1      | 3      | 4 × 4096 × 4 = 65536          |
+| 2      | 0      | 48 × 1 × 1 = 48               |
+| 2      | 1      | 48 × 4 × 4 = 768              |
+| 2      | 2      | 48 × 64 × 9 = 27648           |
+| 2      | 3      | 48 × 4096 × 16 = 3145728      |
+| **Total** |     | **|D(2,3,2)| = 3,240,532**    |
+
+This is too large for exhaustive sweep. In practice, we sample from
+D(2,3,2) or restrict to the denser subclass D(2,2,2) where
+|V(Q)| <= 2, giving |D(2,2,2)| = 4 + 32 + 768 + 48 + 768 + 27648
+= 29,268 rules — feasible for exhaustive enumeration at moderate
+step counts.
+
+
+### B.2 Elements, labels, and canonical order
+
+- **Elements** are nodes of the state graph G_t. Element e = v means
+  node v in G_t. As rewrites add and remove nodes, the element set
+  changes between timesteps. New nodes introduced by a replacement Q
+  receive fresh identifiers.
+- **Labels** are drawn from the alphabet {0, 1, ..., k-1}. The label
+  of evolution graph node (v, t) is the label of state graph node v
+  at time t.
+- **Canonical update order:** when multiple occurrences of P exist as
+  subgraphs of G_t, choose the match involving the lowest-labeled
+  node (comparing node identifiers lexicographically across the
+  match). Ties are broken by the second-lowest node, then third, etc.
+  This is deterministic given a total order on node identifiers.
+
+
+### B.3 Evolution graph construction
+
+Given a spark (r, G_0), the evolution is the sequence of state graphs
+G_0, G_1, G_2, ... produced by repeatedly applying r under canonical
+update order. At each step, one occurrence of P is matched in G_t,
+the matched subgraph is replaced by Q with reconnection phi, yielding
+G_{t+1}. If no match exists, the evolution halts.
+
+The **evolution graph** E(r, G_0) is a directed acyclic graph:
+
+- **Nodes.** Each node (v, t) represents a state graph node v at time
+  t. The node's label is the label of v in G_t.
+
+- **Edges.** A directed edge connects (v, t) to (w, t+1) encoding
+  causal influence:
+  - **Matched-to-replacement edges.** If v was a node in the matched
+    occurrence of P at time t, then (v, t) has edges to every node in
+    the inserted Q at time t+1. Each matched node causally influences
+    the entire replacement.
+  - **Reconnection edges.** If v was matched and phi(v) = q, then for
+    every external neighbor u of v that persists into G_{t+1}, the
+    edge (v, t) -> (u, t+1) is added. The reconnection transmits
+    causal influence to the reattachment site.
+  - **Identity edges.** If v was not part of the match and v persists
+    into G_{t+1}, then (v, t) -> (v, t+1). Unaffected nodes carry
+    forward causally.
+
+This graph encodes the full causal structure of the rewriting
+process. Unlike the 1D case (Appendix A), the spatial structure is
+graph-theoretic: neighborhoods, distances, and regions are defined by
+the topology of G_t, not by a linear ordering.
+
+
+### B.4 Rule-class-specific definitions
+
+- **Seed size** for minimal spark search: number of nodes |V(G_0)|.
+  s_max = n + m (pattern size + replacement size).
+- **Distance function** for characteristic time: graph edit distance
+  between consecutive state graphs G_t and G_{t+1}, normalized by
+  max(|V(G_t)|, |V(G_{t+1})|). Graph edit distance counts the
+  minimum number of node/edge insertions, deletions, and relabelings
+  to transform one graph into the other. When exact GED is too
+  expensive, we use the cheaper proxy: the fraction of nodes whose
+  label or local neighborhood (1-hop degree sequence) changed between
+  G_t and G_{t+1}, computed over nodes present in both timesteps.
+- **Internal state** of subgraph S at time t: the multiset of labels
+  of all nodes in S at time t (consistent with §4.2). No linear order
+  is assumed.
+- **Spatial proximity** for self-reference (§4.4): node a' is in the
+  same spatial region as node a if a' is within the subgraph boundary
+  of S at time t — that is, a' is either in S or adjacent to a node
+  in S in the state graph G_t''. Graph-theoretic proximity replaces
+  positional proximity.
+- **Canonical hash node ordering** for causal invariance: sort
+  evolution graph nodes by (time, node-identifier). Node labeling by
+  (identifier, time, label, in-degree, out-degree) for the canonical
+  hash. The richer labeling compensates for the absence of a natural
+  linear order on graph nodes.
+
+
+### B.5 Relation to Game of Intelligence
+
+The Game of Intelligence (`experiments/directed_graph/engine/`) is a
+specific parametric instance within directed graph rewriting. Its
+rules follow the principle "activity creates structure, disuse
+destroys it" — a family of rules parameterized by activation
+thresholds, growth rates, and decay rates rather than an enumerable
+class.
+
+The Game of Intelligence is not swept exhaustively like D(n, m, k).
+Instead, it is a parameter-sweepable system: T_obs and T_rul are
+measured as functions of continuous parameters. This provides a
+complementary view to the discrete enumeration of D(2,2,2) — one
+asks "what fraction of rules produce observers?" while the other asks
+"how does observer emergence depend on rule parameters?"
+
+Both approaches feed into the same formal claim (§9). The `src/observer/`
+and `src/ruliad/` modules operate on evolution graphs and apply to
+both without modification.
+
+
+### B.6 Why directed graph rewriting
+
+Directed graph rewriting breaks the structural limitation identified
+in Appendix A (§A.6). In 1D rewriting, observer-producing rules and
+confluent rules require opposite structural features. Directed graph
+rewriting provides the middle ground:
+
+- **Spatial structure is graph-theoretic.** Match sites are subgraphs,
+  not intervals. Multiple non-overlapping matches can coexist in
+  spatially separated regions of the graph.
+- **Localized dynamics without drift.** A rewrite affects a node's
+  neighborhood without displacing distant nodes. This enables
+  persistent spatial localization — the key missing ingredient in
+  1D rewriting.
+- **Non-trivial causal invariance is possible.** When two
+  non-overlapping matches exist, the order of application can yield
+  isomorphic results — genuine confluence. This is structurally
+  available because the rewrites operate on independent subgraphs.
+- **Observers and confluence can coexist.** A rule can produce a
+  localized, self-referential active zone (observer) in one region
+  while exhibiting order-independence for non-overlapping rewrites
+  elsewhere. The two properties no longer require opposite structural
+  features.
