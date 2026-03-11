@@ -168,7 +168,7 @@ Hypergraph rewriting breaks the structural limitation: confluence and
 observers can coexist because spatial structure is 2D/3D, match sites
 are non-linear, and multiple simultaneous rewrites interact richly.
 
-- [ ] Adapt definitions.md for hypergraph evolution graphs
+- [x] Restructure definitions.md: rule-class-agnostic §1–§9, string rewriting to Appendix A, directed graph Appendix B placeholder
 - [ ] src/spark/rule_classes/hypergraph_rewriting.py
 - [ ] src/spark/hypergraph_evolution_graph.py
 - [ ] experiments/hypergraph/sweep.py
@@ -225,9 +225,13 @@ confluent rules separate.
 - [ ] theory/dimensionality_gap.md (why 1D rewriting separates the sets)
 
 
-### Wave 9 — Directed graph rewriting [BLOCKED on Wave 4]
+### Wave 9 — Directed graph rewriting [PARTIALLY UNBLOCKED]
 Third rule class (Game of Intelligence engine).
 
+- [x] src/spark/rule_classes/directed_graph.py (DirectedGraphRule: match, apply, evolve, enumerate)
+- [x] src/spark/directed_graph_evolution.py (evolution graph with three causal edge types)
+- [x] src/spark/seed_search.py extended for graph rules (find_minimal_seed_graph)
+- [x] Cardinality verified: |D(2,3,2)| = 3,240,532, |D(2,2,2)| = 29,268
 - [ ] experiments/directed_graph/engine/ (Game of Intelligence)
 - [ ] experiments/directed_graph/sweep.py
 - [ ] experiments/directed_graph/config.yaml
@@ -259,3 +263,6 @@ Written last. Summarizes results that exist.
 | 2026-03-11 | Sensitivity check: observer is moderately robust. D not knife-edge (survives 0.52–>0.70). Persistence is tightest axis (0 at P=12). Mirror symmetry: 1 distinct structure. |
 | 2026-03-11 | Wave 3: T_rul measured for all 1026 active C(8) rules. 314 vacuous (T_rul=0), 0 genuine finite, 712 infinite. Observer rules have T_rul=inf. Sets disjoint. Gate half-passed. |
 | 2026-03-11 | String rewriting chapter closed. Disjoint sets: observer-producing and confluent rules don't overlap. Rule class structurally cannot test full hypothesis. Hypergraph rewriting promoted to Wave 4. |
+| 2026-03-11 | definitions.md restructured: §1–§9 now rule-class-agnostic (abstract evolution graphs). All string-specific content moved to Appendix A (complete, final). Zero mathematical content deleted. |
+| 2026-03-11 | Appendix B written: directed graph rewriting fully specified. Rule class D(n,m,k) defined with cardinality tables. D(2,3,2) = 3.2M rules; D(2,2,2) = 29K feasible for sweep. Evolution graph protocol, canonical order, distance function, spatial proximity all defined. Game of Intelligence noted as parametric instance. |
+| 2026-03-11 | Directed graph rewriting implemented: DirectedGraphRule (match via subgraph isomorphism, apply with reconnection, enumerate D(n,m,k)), DirectedGraphEvolution (causal DAG with three edge types), seed_search extended for graph rules. Cardinalities verified against definitions.md. Pipeline runs end-to-end. |
