@@ -2,24 +2,21 @@
 
 Last updated: 2026-03-11
 
-## Status: FIRST OBSERVERS FOUND in C(8)
+## Status: STRING REWRITING CHAPTER COMPLETE
 
-C(8): 3076 rules, 1026 active, **2 observers**, 8 near-misses (3/4).
+C(8) string rewriting: 1026 active rules, 2 observers (1 unique),
+P_obs = 0.097%. Observer is moderately robust (sensitivity-tested).
+0 rules have genuine causal invariance. T_obs and T_rul sets are
+completely disjoint — no rule has both finite. The scatter plot is
+degenerate.
 
-The two observers are 01->10001 and 10->01110 (mirror images).
-T_obs = 310, tau = 4. All four criteria pass: B = 0.245, H = 1.5,
-D = 0.605 (barely over 0.6 threshold), S = 1.0. P_obs(C(8)) = 0.2%.
+String rewriting cannot test the full hypothesis: the rule class
+structurally separates observer-producing and confluent rules.
+Moving to hypergraph rewriting as the second rule class, where
+confluence and observers can coexist.
 
-The match site follows a period-3 sawtooth: advance +3, retreat -1,
-retreat -1. Net drift +1/3 per step. The oscillation creates a semi-
-localized active zone that sustains boundary stability over the
-persistence window (40 steps).
-
-Eight rules score 3/4, all failing only on causal decoupling. The
-observer exists on a knife-edge (D = 0.605, threshold 0.6).
-
-Wave 2 gate is passed. T_obs is finite. P_obs > 0. Proceed to Wave 3
-(measure T_rul and produce the first T_obs vs T_rul comparison).
+See experiments/string_rewriting/results/conclusion.md for the full
+summary.
 
 ## Performance profile (measured on CPU)
 
@@ -128,90 +125,113 @@ D > 0.70. Persistence multiplier is the true bottleneck: the sawtooth
 drift limits how long the structure can sustain itself.
 
 
-### Wave 3 — The other side [UNBLOCKED]
+### Wave 3 — The other side [COMPLETE]
 Measure T_rul. Produce the central scatter plot.
 
-- [ ] src/ruliad/causal_invariance.py (canonical hash test, k=50)
+- [x] src/ruliad/causal_invariance.py (canonical hash test, k=50)
+- [x] experiments/string_rewriting/trul_sweep.py (GUI runner)
+- [x] experiments/string_rewriting/results/c8_trul.json
+- [x] experiments/string_rewriting/results/c8_trul.md
+- [x] experiments/string_rewriting/results/c8_scatter.json
 - [ ] src/ruliad/dimensionality.py
-- [ ] Extend sweep.py to compute T_rul alongside T_obs
-- [ ] First T_obs vs T_rul scatter plot
+- [ ] First T_obs vs T_rul scatter plot (degenerate in C(8) — see below)
 
 **Gate:** Is T_obs < T_rul for the majority of rules where both are
 finite? If yes, the hypothesis has first contact with evidence. If
 no, we have a problem — either the hypothesis is wrong or the rule
 class is too small. Try C(6) before giving up.
 
+**C(8) gate result:** 0 rules have BOTH finite T_obs and T_rul. The
+sets are completely disjoint. 314 rules have vacuous T_rul=0 (unique
+match, no choice of order). 0 rules have genuine finite T_rul. Both
+observer rules have T_rul=infinity.
 
-### Wave 4 — Null model [BLOCKED on Wave 3]
+P_obs=0.2% vs P_rul(genuine)=0%. Observers exist; genuine physics
+does not. The ordering claim (T_obs < T_rul) is vacuously true
+(zero data points). C(8) establishes that observers are cheap but
+cannot test whether physics is expensive *relative to* observers,
+because physics doesn't appear at all.
+
+The scatter plot is degenerate: all points lie on the axes. A
+meaningful scatter requires a rule class where both properties can
+coexist. **GATE: HALF-PASSED.** String rewriting chapter closed.
+Hypergraph rewriting promoted to immediate next step.
+
+See experiments/string_rewriting/results/conclusion.md.
+
+
+### Wave 4 — Hypergraph rewriting [IMMEDIATE NEXT STEP]
+Second rule class. Promoted from Wave 9 because string rewriting
+cannot produce the non-degenerate scatter plot the hypothesis needs.
+
+Hypergraph rewriting breaks the structural limitation: confluence and
+observers can coexist because spatial structure is 2D/3D, match sites
+are non-linear, and multiple simultaneous rewrites interact richly.
+
+- [ ] Adapt definitions.md for hypergraph evolution graphs
+- [ ] src/spark/rule_classes/hypergraph_rewriting.py
+- [ ] src/spark/hypergraph_evolution_graph.py
+- [ ] experiments/hypergraph/sweep.py
+- [ ] experiments/hypergraph/config.yaml
+- [ ] experiments/hypergraph/results/
+- [ ] First non-degenerate T_obs vs T_rul scatter plot
+
+**Gate:** Does any hypergraph rule have both finite T_obs and finite
+T_rul? If yes, the scatter plot becomes the central artifact. If no,
+the hypothesis may need a different rule class or revised definitions.
+
+
+### Wave 5 — Null model [BLOCKED on Wave 4]
 Verify definitions aren't trivially satisfied.
 
-- [ ] src/ruliad/coherence.py
 - [ ] Null model generator (configuration model, matched degree sequence)
-- [ ] Run observer detection on null graphs
+- [ ] Run observer detection on null graphs for both string and hypergraph
 - [ ] Compute P_null, compare to P_obs
 
 **Gate:** Is P_null << P_obs? If not, definitions are too loose.
-Tighten and rerun from Wave 2. This is the second most likely
-revision point.
-
-
-### Wave 5 — Counterexamples [BLOCKED on Wave 3]
-Populate the failure taxonomy.
-
-- [ ] experiments/counterexamples/obs_without_rul.py
-- [ ] experiments/counterexamples/rul_without_obs.py
-- [ ] experiments/counterexamples/false_positives.py
-- [ ] experiments/counterexamples/borderline/ (specific cases)
-- [ ] experiments/counterexamples/notes.md
-
-**Gate:** Do counterexamples reveal a systematic flaw in the
-definitions, or are they informative edge cases? If systematic,
-revise definitions.md.
 
 
 ### Wave 6 — Robustness [BLOCKED on Wave 4]
-Vary thresholds. Does the prevalence gap survive?
+Threshold sensitivity for hypergraph rewriting (string rewriting
+sensitivity already done in Wave 2.5).
 
-- [ ] Parameter sweep: epsilon_B, epsilon_H, epsilon_D, persistence multiplier
-- [ ] experiments/comparison/aggregate.py
-- [ ] experiments/comparison/threshold_distributions.ipynb
+- [ ] Parameter sweep for hypergraph observers
+- [ ] Cross-class comparison in experiments/comparison/
 - [ ] Robustness figures
 
-**Gate:** Does the gap survive reasonable parameter variation? If it
-collapses under small changes, the claim is fragile — report honestly.
+**Gate:** Does the prevalence gap survive reasonable parameter
+variation across rule classes?
 
 
-### Wave 7 — Notebooks [BLOCKED on Wave 3]
-Public-facing walkthroughs.
+### Wave 7 — String rewriting deferred work [DEPRIORITIZED]
+Null model and additional counterexamples for string rewriting.
+Revisit after hypergraph results provide context.
 
+- [ ] src/ruliad/coherence.py (string rewriting null model)
+- [ ] experiments/counterexamples/ taxonomy completion
+- [ ] experiments/string_rewriting/analysis.ipynb (T_obs histogram)
 - [ ] notebooks/01_see_an_observer.ipynb (one rule, visualized)
-- [ ] notebooks/02_the_claim.ipynb (scatter plot, histograms)
-- [ ] notebooks/03_game_of_intelligence.ipynb (placeholder until Wave 9)
 
 
-### Wave 8 — Theory [BLOCKED on Wave 3, partially independent]
-Structural arguments. Can begin after first scatter plot exists.
+### Wave 8 — Theory [PARTIALLY UNBLOCKED]
+Structural arguments. The disjoint-sets result from string rewriting
+motivates theoretical analysis of why observer-producing rules and
+confluent rules separate.
 
 - [ ] theory/local_vs_global.md
 - [ ] theory/bootstrapping.md (migrate from Game of Intelligence work)
 - [ ] theory/observer_logic.md (descriptive complexity question)
 - [ ] theory/open_problems.md (accumulates throughout)
+- [ ] theory/dimensionality_gap.md (why 1D rewriting separates the sets)
 
 
-### Wave 9 — Second rule class [BLOCKED on Wave 6]
-Generalization test.
+### Wave 9 — Directed graph rewriting [BLOCKED on Wave 4]
+Third rule class (Game of Intelligence engine).
 
 - [ ] experiments/directed_graph/engine/ (Game of Intelligence)
 - [ ] experiments/directed_graph/sweep.py
 - [ ] experiments/directed_graph/config.yaml
 - [ ] experiments/directed_graph/analysis.ipynb
-- [ ] experiments/hypergraph/sweep.py
-- [ ] experiments/hypergraph/config.yaml
-- [ ] experiments/hypergraph/analysis.ipynb
-- [ ] Cross-class comparison in experiments/comparison/
-
-**Gate:** Does the prevalence gap generalize beyond string rewriting?
-Confirmation, not discovery. Report either way.
 
 
 ### Wave 10 — Paper and docs [BLOCKED on Wave 6]
@@ -237,3 +257,5 @@ Written last. Summarizes results that exist.
 | 2026-03-11 | C(6) match site diagnostic: all 6 rules drift monotonically, no spatial localization possible. |
 | 2026-03-11 | C(8) swept: **2 observers found** (01->10001, 10->01110). T_obs=310. 8 near-misses at 3/4. P_obs=0.2%. Wave 2 gate passed. |
 | 2026-03-11 | Sensitivity check: observer is moderately robust. D not knife-edge (survives 0.52–>0.70). Persistence is tightest axis (0 at P=12). Mirror symmetry: 1 distinct structure. |
+| 2026-03-11 | Wave 3: T_rul measured for all 1026 active C(8) rules. 314 vacuous (T_rul=0), 0 genuine finite, 712 infinite. Observer rules have T_rul=inf. Sets disjoint. Gate half-passed. |
+| 2026-03-11 | String rewriting chapter closed. Disjoint sets: observer-producing and confluent rules don't overlap. Rule class structurally cannot test full hypothesis. Hypergraph rewriting promoted to Wave 4. |
