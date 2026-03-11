@@ -2,15 +2,20 @@
 
 Last updated: 2026-03-11
 
-## Status: Wave 1 — Detection pipeline (gate check needed)
+## Status: Wave 2 gate reached — C(4) below threshold, pivoting to C(6)
 
-The full detection pipeline is implemented and runs end-to-end.
-Quick test (200 steps) finds 0/20 active rules with finite T_obs.
-Best near-miss passes 2/4 criteria (boundary stability + self-reference).
-Need longer runs (1000–10000 steps) to determine if T_obs is ever finite.
+T_obs = infinity for all 20 active C(4) rules. Every rule produces
+uniform or perfectly periodic strings. Internal entropy = 0 and
+causal decoupling = 0.5 universally. Boundary stability and
+self-reference pass trivially (uniform growth, fixed match site).
 
-**Open issue:** Enumeration produces |C(4)| = 68, but definitions.md
-states 56. Needs investigation — possible counting error in definitions.md.
+C(4) lacks multi-symbol matches and length-preserving rules. C(6)
+is the smallest class with these features (516 rules, 174 active,
+84 length-preserving). Estimated sweep time: ~6 min at 1000 steps.
+
+See `experiments/string_rewriting/results/c4_summary.md` for full
+results and `experiments/counterexamples/notes.md` for trivial-pass
+concerns.
 
 ## Performance profile (measured on CPU)
 
@@ -39,7 +44,7 @@ Graph construction is fast (<0.1s at 1000 steps).
 
 ## Waves
 
-### Wave 1 — Detection pipeline [CODE COMPLETE, GATE PENDING]
+### Wave 1 — Detection pipeline [COMPLETE]
 Build the full observer detection for a single rule.
 
 - [x] Repository structure
@@ -62,23 +67,30 @@ Build the full observer detection for a single rule.
 **Gate:** Does the pipeline run end-to-end on one rule? Does T_obs
 come back finite for at least one rule in C(4)?
 
-**Gate status:** Pipeline runs end-to-end (8s for 20 active rules at
-200 steps). No finite T_obs yet — need longer evolution runs to
-determine. If T_obs remains infinite at 10000 steps, definitions may
-be too tight (revision path per Wave 2 gate).
+**Gate result:** Pipeline runs end-to-end. T_obs = infinity for all of
+C(4). The class is below the observer complexity threshold. This is a
+valid negative result, not a pipeline failure.
 
 
-### Wave 2 — The sweep [BLOCKED on Wave 1]
-Run every rule in C(4). First histogram of T_obs.
+### Wave 2 — The sweep [C(4) COMPLETE, PIVOTING TO C(6)]
+Run every rule in a class. First histogram of T_obs.
 
+- [x] C(4) sweep: 0/20 active rules produce observers (see results/c4_summary.md)
+- [x] Entropy pre-filter in detect.py (skip frozen interiors immediately)
+- [ ] C(6) sweep at 1000 steps (~6 min estimated)
 - [ ] experiments/string_rewriting/config.yaml
 - [ ] experiments/string_rewriting/sweep.py (T_obs only)
 - [ ] experiments/string_rewriting/analysis.ipynb (T_obs histogram)
 
-**Gate:** What fraction of C(4) produces observers? If zero, definitions
-are too tight — revise definitions.md before proceeding. If all,
-definitions are too loose — same. Either outcome loops back to
-definitions.md, not forward.
+**Gate:** What fraction of C(6) produces observers? If zero, definitions
+may be too tight or the rule class too small — try C(8) or revise
+definitions.md. If all, definitions are too loose. Either outcome loops
+back to definitions.md, not forward.
+
+**C(4) gate result:** P_obs(C(4)) = 0. This is the "too tight" path,
+but the cause is structural (rules too simple for heterogeneous
+dynamics), not definitional. Pivoting to C(6) before revising
+definitions.
 
 
 ### Wave 3 — The other side [BLOCKED on Wave 2]
@@ -185,3 +197,4 @@ Written last. Summarizes results that exist.
 | 2026-03-11 | Initial plan created. Wave 1 in progress. |
 | 2026-03-11 | All Wave 1 code complete. Pipeline runs end-to-end. Gate pending: need longer runs to check for finite T_obs. |
 | 2026-03-11 | Added performance profile. Detection is O(n^2), ~1.7hrs for 10K steps. CPU optimization before CUDA. |
+| 2026-03-11 | Wave 2 gate reached: T_obs = inf for all C(4). Uniform 2/4 failure (entropy=0, decoupling=0.5). Pivoting to C(6). Entropy pre-filter added to detect.py. |

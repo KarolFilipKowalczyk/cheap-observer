@@ -185,36 +185,37 @@ def _score_candidate(
     tau: int,
     criteria: ObserverCriteria,
 ) -> ScoredCandidate | None:
-    """Score a candidate, pruning early if any criterion fails.
+    """Score a candidate, pruning early if any criterion clearly fails.
 
-    Evaluates criteria in order of increasing cost:
-    1. Boundary stability (cheap: set operations)
-    2. Internal entropy (moderate: string collection + counter)
+    Evaluates criteria in order that maximizes early pruning:
+    1. Internal entropy (cheapest and most discriminating: frozen
+       interiors are the dominant failure mode in small rule classes)
+    2. Boundary stability (cheap: set operations)
     3. Self-reference (moderate: BFS)
     4. Causal decoupling (expensive: MI or NCD computation)
 
-    Returns None if boundary stability already clearly fails (score > 2x
-    threshold), allowing fast skip of hopeless candidates. Otherwise
-    returns full scores for spectrum analysis even if the candidate fails.
+    Returns None if a hard-prune condition is met (entropy exactly zero,
+    or boundary wildly unstable), allowing fast skip of hopeless
+    candidates. Otherwise returns full scores for spectrum analysis
+    even if the candidate fails.
     """
-    # 1. Boundary stability (cheapest)
-    b_score = boundary_stability_score(sg, t_start, t_end)
-    # Hard prune: if boundary is wildly unstable, skip entirely
-    if b_score > criteria.epsilon_B * 3:
+    # 1. Internal entropy (cheapest and most common failure)
+    h_score = internal_entropy_score(sg, t_start, t_end, tau)
+    # Hard prune: frozen interior cannot be an observer
+    if h_score < 0.01:
         return None
 
-    # 2. Internal entropy
-    h_score = internal_entropy_score(sg, t_start, t_end, tau)
+    # 2. Boundary stability
+    b_score = boundary_stability_score(sg, t_start, t_end)
+    # Hard prune: wildly unstable boundary
+    if b_score > criteria.epsilon_B * 3:
+        return None
 
     # 3. Self-reference (before decoupling — cheaper than MI)
     s_score = self_reference_score(sg, t_start, t_end)
 
     # 4. Causal decoupling (most expensive)
-    # Skip if entropy is zero — constant state means MI will be degenerate
-    if h_score < 0.01:
-        d_score = 0.5  # No variation, default to uninformative
-    else:
-        d_score = causal_decoupling_score(sg, t_start, t_end, tau)
+    d_score = causal_decoupling_score(sg, t_start, t_end, tau)
 
     return ScoredCandidate(
         subgraph=sg,
