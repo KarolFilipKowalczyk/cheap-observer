@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Experiment results (keep .gitkeep placeholders)
+experiments/*/results/*.csv
+experiments/*/results/*.pkl
+!experiments/*/results/.gitkeep
+experiments/comparison/figures/*.png
+!experiments/comparison/figures/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Virtual environments
+.venv/
+venv/
+env/
