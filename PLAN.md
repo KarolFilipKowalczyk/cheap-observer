@@ -104,6 +104,30 @@ finite T_obs = 310. Observers are 01->10001 and 10->01110. Decoupling
 passes by 0.005 (knife-edge). All 8 near-misses fail only on D.
 
 
+### Wave 2.5 — Threshold sensitivity [COMPLETE]
+Pre-Wave-3 robustness check on C(8) observers.
+
+- [x] experiments/string_rewriting/sensitivity.py (GUI runner)
+- [x] Vary epsilon_D: 0.50–0.70 (13 values)
+- [x] Vary epsilon_B: 0.15–0.40 (10 values)
+- [x] Vary epsilon_H: 0.50–2.00 (7 values)
+- [x] Vary persistence_multiplier: 5–20 (6 values)
+- [x] experiments/string_rewriting/results/c8_sensitivity.md
+- [x] experiments/string_rewriting/results/c8_sensitivity.json
+- [x] Mirror symmetry correction: 2 observers = 1 distinct structure
+
+**Result:** Observer is moderately robust, not a knife-edge artifact.
+- epsilon_D: flat 2 obs from 0.52 to >0.70 (most robust axis)
+- epsilon_B: 2 obs from 0.25–0.30, 6 obs at 0.35+ (critical at 0.25)
+- epsilon_H: 2 obs from 0.50–1.25 (lost at 1.50)
+- persistence: 2 obs at P=10, 6 at P=8, 0 at P=12 (tightest axis)
+
+The "knife-edge at D=0.605" characterization was misleading — that was
+one candidate's score. Other candidates for the same rule achieve
+D > 0.70. Persistence multiplier is the true bottleneck: the sawtooth
+drift limits how long the structure can sustain itself.
+
+
 ### Wave 3 — The other side [UNBLOCKED]
 Measure T_rul. Produce the central scatter plot.
 
@@ -212,3 +236,4 @@ Written last. Summarizes results that exist.
 | 2026-03-11 | C(6) swept: 0/174 observers. 6 rules past entropy filter, best 2/4 (01->1001). All LP/shrinking rules sterile. Bottleneck: boundary stability and decoupling. |
 | 2026-03-11 | C(6) match site diagnostic: all 6 rules drift monotonically, no spatial localization possible. |
 | 2026-03-11 | C(8) swept: **2 observers found** (01->10001, 10->01110). T_obs=310. 8 near-misses at 3/4. P_obs=0.2%. Wave 2 gate passed. |
+| 2026-03-11 | Sensitivity check: observer is moderately robust. D not knife-edge (survives 0.52–>0.70). Persistence is tightest axis (0 at P=12). Mirror symmetry: 1 distinct structure. |
