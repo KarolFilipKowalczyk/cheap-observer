@@ -225,9 +225,13 @@ confluent rules separate.
 - [ ] theory/dimensionality_gap.md (why 1D rewriting separates the sets)
 
 
-### Wave 9 — Directed graph rewriting [BLOCKED on Wave 4]
+### Wave 9 — Directed graph rewriting [PARTIALLY UNBLOCKED]
 Third rule class (Game of Intelligence engine).
 
+- [x] src/spark/rule_classes/directed_graph.py (DirectedGraphRule: match, apply, evolve, enumerate)
+- [x] src/spark/directed_graph_evolution.py (evolution graph with three causal edge types)
+- [x] src/spark/seed_search.py extended for graph rules (find_minimal_seed_graph)
+- [x] Cardinality verified: |D(2,3,2)| = 3,240,532, |D(2,2,2)| = 29,268
 - [ ] experiments/directed_graph/engine/ (Game of Intelligence)
 - [ ] experiments/directed_graph/sweep.py
 - [ ] experiments/directed_graph/config.yaml
@@ -261,3 +265,4 @@ Written last. Summarizes results that exist.
 | 2026-03-11 | String rewriting chapter closed. Disjoint sets: observer-producing and confluent rules don't overlap. Rule class structurally cannot test full hypothesis. Hypergraph rewriting promoted to Wave 4. |
 | 2026-03-11 | definitions.md restructured: §1–§9 now rule-class-agnostic (abstract evolution graphs). All string-specific content moved to Appendix A (complete, final). Zero mathematical content deleted. |
 | 2026-03-11 | Appendix B written: directed graph rewriting fully specified. Rule class D(n,m,k) defined with cardinality tables. D(2,3,2) = 3.2M rules; D(2,2,2) = 29K feasible for sweep. Evolution graph protocol, canonical order, distance function, spatial proximity all defined. Game of Intelligence noted as parametric instance. |
+| 2026-03-11 | Directed graph rewriting implemented: DirectedGraphRule (match via subgraph isomorphism, apply with reconnection, enumerate D(n,m,k)), DirectedGraphEvolution (causal DAG with three edge types), seed_search extended for graph rules. Cardinalities verified against definitions.md. Pipeline runs end-to-end. |
