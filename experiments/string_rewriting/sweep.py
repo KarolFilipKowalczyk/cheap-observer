@@ -7,7 +7,6 @@ to src.engine.runner.run_sweep.
 Usage:
     py -m experiments.string_rewriting.sweep
     py -m experiments.string_rewriting.sweep --steps 2000 --workers 8
-    py -m experiments.string_rewriting.sweep --no-gui
 """
 
 from __future__ import annotations
@@ -49,8 +48,6 @@ def main() -> None:
                         help="Parallel workers")
     parser.add_argument("--output", type=str, default=None,
                         help="Output JSON path")
-    parser.add_argument("--no-gui", action="store_true",
-                        help="Disable tkinter window")
     args = parser.parse_args()
 
     # Find config.yaml
@@ -88,7 +85,6 @@ def main() -> None:
         workers=workers,
         output=output,
         criteria=criteria,
-        gui=not args.no_gui,
     )
 
 

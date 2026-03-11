@@ -415,6 +415,7 @@ def _try_gui(state: SweepState) -> None:
                     f"{_fmt_time(state.elapsed)}"
                 )
                 lbl_summary.config(text=summary, fg="#006600")
+                root.after(2000, root.destroy)
             else:
                 root.after(200, _update)
         except Exception:
@@ -451,7 +452,6 @@ def run_sweep(
     workers: int = 1,
     output: str | None = None,
     criteria: ObserverCriteria = DEFAULT_CRITERIA,
-    gui: bool = True,
     progress_path: str = ".progress.json",
 ) -> list[RuleResult]:
     """Run the full sweep over a rule class.
@@ -462,7 +462,6 @@ def run_sweep(
         workers: Number of parallel workers (1 = sequential).
         output: Path for the output JSON file. None to skip.
         criteria: Observer criteria thresholds.
-        gui: Whether to attempt opening a tkinter window.
         progress_path: Path for the .progress.json checkpoint file.
 
     Returns:
@@ -487,8 +486,7 @@ def run_sweep(
     sweep_thread.start()
 
     # Try GUI on the main thread (tkinter requires it)
-    if gui:
-        _try_gui(state)
+    _try_gui(state)
 
     # If GUI didn't run or closed early, wait for sweep to finish
     sweep_thread.join()
