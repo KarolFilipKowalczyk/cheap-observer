@@ -168,7 +168,7 @@ Hypergraph rewriting breaks the structural limitation: confluence and
 observers can coexist because spatial structure is 2D/3D, match sites
 are non-linear, and multiple simultaneous rewrites interact richly.
 
-- [ ] Adapt definitions.md for hypergraph evolution graphs
+- [x] Restructure definitions.md: rule-class-agnostic §1–§9, string rewriting to Appendix A, directed graph Appendix B placeholder
 - [ ] src/spark/rule_classes/hypergraph_rewriting.py
 - [ ] src/spark/hypergraph_evolution_graph.py
 - [ ] experiments/hypergraph/sweep.py
@@ -259,3 +259,4 @@ Written last. Summarizes results that exist.
 | 2026-03-11 | Sensitivity check: observer is moderately robust. D not knife-edge (survives 0.52–>0.70). Persistence is tightest axis (0 at P=12). Mirror symmetry: 1 distinct structure. |
 | 2026-03-11 | Wave 3: T_rul measured for all 1026 active C(8) rules. 314 vacuous (T_rul=0), 0 genuine finite, 712 infinite. Observer rules have T_rul=inf. Sets disjoint. Gate half-passed. |
 | 2026-03-11 | String rewriting chapter closed. Disjoint sets: observer-producing and confluent rules don't overlap. Rule class structurally cannot test full hypothesis. Hypergraph rewriting promoted to Wave 4. |
+| 2026-03-11 | definitions.md restructured: §1–§9 now rule-class-agnostic (abstract evolution graphs). All string-specific content moved to Appendix A (complete, final). Appendix B placeholder for directed graph rewriting. Zero mathematical content deleted. |
