@@ -17,7 +17,7 @@ import warnings
 from dataclasses import dataclass
 from typing import Iterator, Literal
 
-STATED_CARDINALITY_C4 = 56
+STATED_CARDINALITY_C4 = 68
 
 
 @dataclass(frozen=True)

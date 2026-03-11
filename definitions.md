@@ -23,8 +23,9 @@ For l = 4 (e.g., L and R are each at most 2 symbols), C(4) contains
 a finite, enumerable set of rules. Its exact cardinality is computed
 as follows: for each pair of lengths (|L|, |R|) with |L| >= 1,
 |R| >= 1, and |L| + |R| <= 4, we count all binary strings of those
-lengths, excluding cases where L is empty (the rule must match
-something). The cardinality |C(4)| = 56. This is our initial
+lengths. The six (|L|, |R|) bins are (1,1), (1,2), (1,3), (2,1),
+(2,2), (3,1), contributing 4 + 8 + 16 + 8 + 16 + 16 = 68 rules.
+The cardinality |C(4)| = 68. This is our initial
 experimental domain. Later work may extend to hypergraph rewriting and directed
 graph rewriting (the Game of Intelligence rule class), but all
 definitions below are stated for string rewriting first and must be
