@@ -2,20 +2,26 @@
 
 Last updated: 2026-03-11
 
-## Status: Wave 2 gate reached — C(4) below threshold, pivoting to C(6)
+## Status: Wave 2 gate — C(6) swept, 0 observers, bottleneck identified
 
-T_obs = infinity for all 20 active C(4) rules. Every rule produces
-uniform or perfectly periodic strings. Internal entropy = 0 and
-causal decoupling = 0.5 universally. Boundary stability and
-self-reference pass trivially (uniform growth, fixed match site).
+C(6): 516 rules, 174 active (all growing), 0 observers, 0 near-misses
+at 3/4. Best result: 2/4 (01->1001, 10->0110) — entropy and self-
+reference pass, boundary stability and decoupling fail.
 
-C(4) lacks multi-symbol matches and length-preserving rules. C(6)
-is the smallest class with these features (516 rules, 174 active,
-84 length-preserving). Estimated sweep time: ~6 min at 1000 steps.
+Key findings:
+- All 84 length-preserving and 216 shrinking rules are sterile.
+  Single-rule binary string rewriting can only sustain dynamics
+  through growth.
+- 6 of 174 active rules pass the entropy pre-filter (first non-frozen
+  interiors in the project).
+- Boundary stability fails because the match site moves (B = 0.319,
+  threshold 0.3). Decoupling fails because dynamics are not self-
+  contained (D = 0.462, threshold 0.6).
+- Bottleneck shifted from "no internal dynamics" (C(4)) to "dynamics
+  exist but are not bounded" (C(6)).
 
-See `experiments/string_rewriting/results/c4_summary.md` for full
-results and `experiments/counterexamples/notes.md` for trivial-pass
-concerns.
+See `experiments/string_rewriting/results/c6_summary.md` for full
+results.
 
 ## Performance profile (measured on CPU)
 
@@ -72,25 +78,30 @@ C(4). The class is below the observer complexity threshold. This is a
 valid negative result, not a pipeline failure.
 
 
-### Wave 2 — The sweep [C(4) COMPLETE, PIVOTING TO C(6)]
+### Wave 2 — The sweep [C(4) and C(6) COMPLETE]
 Run every rule in a class. First histogram of T_obs.
 
 - [x] C(4) sweep: 0/20 active rules produce observers (see results/c4_summary.md)
 - [x] Entropy pre-filter in detect.py (skip frozen interiors immediately)
-- [ ] C(6) sweep at 1000 steps (~6 min estimated)
-- [ ] experiments/string_rewriting/config.yaml
-- [ ] experiments/string_rewriting/sweep.py (T_obs only)
+- [x] src/engine/runner.py (multiprocessing runner with optional GUI)
+- [x] experiments/string_rewriting/config.yaml
+- [x] experiments/string_rewriting/sweep.py (T_obs only)
+- [x] C(6) sweep: 0/174 observers, 6 rules past entropy filter,
+      best 2/4 (see results/c6_summary.md)
+- [ ] C(8) sweep or longer runs on promising C(6) rules
 - [ ] experiments/string_rewriting/analysis.ipynb (T_obs histogram)
 
-**Gate:** What fraction of C(6) produces observers? If zero, definitions
-may be too tight or the rule class too small — try C(8) or revise
-definitions.md. If all, definitions are too loose. Either outcome loops
-back to definitions.md, not forward.
+**Gate:** What fraction produces observers? If zero, definitions may be
+too tight or the rule class too small.
 
-**C(4) gate result:** P_obs(C(4)) = 0. This is the "too tight" path,
-but the cause is structural (rules too simple for heterogeneous
-dynamics), not definitional. Pivoting to C(6) before revising
-definitions.
+**C(4) gate result:** P_obs = 0. Rules too simple for any internal dynamics.
+
+**C(6) gate result:** P_obs = 0. First non-frozen interiors (6 rules).
+Bottleneck shifted to boundary stability (B = 0.319, threshold 0.3)
+and causal decoupling (D = 0.462, threshold 0.6). All length-preserving
+and shrinking rules are sterile — single-rule binary rewriting can
+only sustain dynamics through growth. Need C(8) or structural changes
+to the rule class.
 
 
 ### Wave 3 — The other side [BLOCKED on Wave 2]
@@ -198,3 +209,4 @@ Written last. Summarizes results that exist.
 | 2026-03-11 | All Wave 1 code complete. Pipeline runs end-to-end. Gate pending: need longer runs to check for finite T_obs. |
 | 2026-03-11 | Added performance profile. Detection is O(n^2), ~1.7hrs for 10K steps. CPU optimization before CUDA. |
 | 2026-03-11 | Wave 2 gate reached: T_obs = inf for all C(4). Uniform 2/4 failure (entropy=0, decoupling=0.5). Pivoting to C(6). Entropy pre-filter added to detect.py. |
+| 2026-03-11 | C(6) swept: 0/174 observers. 6 rules past entropy filter, best 2/4 (01->1001). All LP/shrinking rules sterile. Bottleneck: boundary stability and decoupling. |
